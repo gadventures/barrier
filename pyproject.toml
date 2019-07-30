@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "barrier"
+version = "0.1.0"
+description = "Serve static files safely behind OpenIDConnect-compatible authentication (i.e. Okta)"
+authors = ["Matthew de Verteuil <mdeverteuil@gadventures.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+Flask = "^1.1"
+flask-oidc = "^1.4"
+gunicorn = "^19.9"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+barrier = "barrier.barrier:main"
+barrier-wsgi = "barrier.wsgi_runner:main"
+barrier-config = "barrier.configure:main"
+
+[tool.black]
+line-length = 120
+target-version = ["py37"]
+exclude = """(/\.git/)"""
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
