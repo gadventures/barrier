@@ -12,10 +12,11 @@ flask-oidc = "^1.4"
 gunicorn = "^19.9"
 
 [tool.poetry.dev-dependencies]
+pre-commit = "^1.17"
 
 [tool.poetry.scripts]
-barrier = "barrier.barrier:main"
-barrier-wsgi = "barrier.wsgi_runner:main"
+barrier-dev = "barrier.app:app.run"
+barrier-wsgi = "barrier.wsgi:main"
 barrier-config = "barrier.configure:main"
 
 [tool.black]

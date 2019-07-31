@@ -1,43 +1,47 @@
 #!/usr/bin/env python
-"""Configure Client Secrets for Barrier Service
+"""Configure Client Secrets for Barrier Service.
 
-This script will generate ``client-secrets.json``, which will provide the credentials necessary for ``barrier.py` to
+This script will generate ``client-secrets.json``, which will provide the credentials necessary for ``app.py` to
 integrate with the OpenIDConnect service (i.e. Okta).
 
 """
-import os
 import pathlib
+
+import click
 
 CLIENT_SECRETS_TEMPLATE = """{{
   "web": {{
-    "client_id": "{BARRIER_CLIENT_ID}",
-    "client_secret": "{BARRIER_CLIENT_SECRET}",
-    "auth_uri": "{BARRIER_AUTH_URI}",
-    "token_uri": "{BARRIER_TOKEN_URI}",
-    "issuer": "{BARRIER_ISSUER}",
-    "userinfo_uri": "{BARRIER_USERINFO_URI}",
+    "client_id": "{client_id}",
+    "client_secret": "{client_secret}",
+    "auth_uri": "{auth_uri}",
+    "token_uri": "{token_uri}",
+    "issuer": "{issuer}",
+    "userinfo_uri": "{userinfo_uri}",
     "redirect_uris": [
-      "{BARRIER_REDIRECT_URI}"
+      "{redirect_uri}"
     ]
   }}
 }}
 """
 
-REQUIRED_ENVIRONMENT = [
-    "BARRIER_CLIENT_ID",
-    "BARRIER_CLIENT_SECRET",
-    "BARRIER_AUTH_URI",
-    "BARRIER_TOKEN_URI",
-    "BARRIER_ISSUER",
-    "BARRIER_USERINFO_URI",
-    "BARRIER_REDIRECT_URI",
-]
+
+class RequiredEnvironmentError(KeyError):
+    """Required environment variable was not set."""
 
 
-def main():
-    for key in REQUIRED_ENVIRONMENT:
-        assert key in os.environ, f"Missing Required Environment Variable: {key}"
-    client_secrets_json = CLIENT_SECRETS_TEMPLATE.format(**os.environ)
+@click.option("--client-id", envvar="BARRIER_CLIENT_ID", required=True)
+@click.option("--client-secret", envvar="BARRIER_CLIENT_SECRET", required=True)
+@click.option("--auth-uri", envvar="BARRIER_AUTH_URI", required=True)
+@click.option("--token-uri", envvar="BARRIER_TOKEN_URI", required=True)
+@click.option("--issuer", envvar="BARRIER_ISSUER", required=True)
+@click.option("--userinfo-uri", envvar="BARRIER_USERINFO_URI", required=True)
+@click.option("--redirect-uri", envvar="BARRIER_REDIRECT_URI", required=True)
+@click.command()
+def main(
+    client_id: str, client_secret: str, auth_uri: str, token_uri: str, issuer: str, userinfo_uri: str, redirect_uri: str
+):
+    """Generate client secrets file."""
+    client_secrets_json = CLIENT_SECRETS_TEMPLATE.format(**locals())
     pathlib.Path("client-secrets.json").write_text(client_secrets_json, encoding="utf-8")
 
 
