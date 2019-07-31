@@ -5,6 +5,7 @@ This script will generate ``client-secrets.json``, which will provide the creden
 integrate with the OpenIDConnect service (i.e. Okta).
 
 """
+import os
 import pathlib
 
 import click
@@ -29,13 +30,33 @@ class RequiredEnvironmentError(KeyError):
     """Required environment variable was not set."""
 
 
-@click.option("--client-id", envvar="BARRIER_CLIENT_ID", required=True)
-@click.option("--client-secret", envvar="BARRIER_CLIENT_SECRET", required=True)
-@click.option("--auth-uri", envvar="BARRIER_AUTH_URI", required=True)
-@click.option("--token-uri", envvar="BARRIER_TOKEN_URI", required=True)
-@click.option("--issuer", envvar="BARRIER_ISSUER", required=True)
-@click.option("--userinfo-uri", envvar="BARRIER_USERINFO_URI", required=True)
-@click.option("--redirect-uri", envvar="BARRIER_REDIRECT_URI", required=True)
+def convert_option_name_to_environment_variable_name(option_name: str) -> str:
+    """Convert given option name to uppercase, replace hyphens with underscores, and add "BARRIER_" prefix."""
+    return f"BARRIER_{option_name.upper().replace('-', '_')}"
+
+
+def required_option(option_name: str) -> click.option:
+    """Generate a required Click option with envvar support and help message."""
+
+    def is_null(environment_variable_name):
+        return environment_variable_name not in os.environ
+
+    environment_variable_name = convert_option_name_to_environment_variable_name(option_name)
+    return click.option(
+        f"--{option_name}",
+        envvar=environment_variable_name,
+        required=is_null(environment_variable_name),
+        help=f"(ENV: {environment_variable_name}) ",
+    )
+
+
+@required_option("client-id")
+@required_option("client-secret")
+@required_option("auth-uri")
+@required_option("token-uri")
+@required_option("issuer")
+@required_option("userinfo-uri")
+@required_option("redirect-uri")
 @click.command()
 def main(
     client_id: str, client_secret: str, auth_uri: str, token_uri: str, issuer: str, userinfo_uri: str, redirect_uri: str

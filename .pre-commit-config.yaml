@@ -3,7 +3,7 @@
 default_stages: [commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.2.1
+    rev: v2.2.3
     hooks:
       - id: check-added-large-files
       - id: mixed-line-ending
@@ -22,7 +22,7 @@ repos:
         args:
           - --statistics
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.3.0
+    rev: v1.4.1
     hooks:
       - id: python-check-blanket-noqa
       - id: python-check-mock-methods
@@ -33,24 +33,24 @@ repos:
     hooks:
       - id: python-safety-dependencies-check
   - repo: https://github.com/asottile/seed-isort-config
-    rev: v1.8.0
+    rev: v1.9.2
     hooks:
       - id: seed-isort-config
         args:
           - --application-directories
           - barrier
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v4.3.18
+    rev: v4.3.21
     hooks:
       - id: isort
         additional_dependencies:
           - isort[pyproject]
   - repo: https://github.com/ambv/black
-    rev: 4a953b7241ce5f8bcac985fa33fdf3af4f42c0de
+    rev: e66451761fab864cce9077a3ee72999543b8ef65
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/bandit
-    rev: 823138f418905a99fb7bbff8bb35b97f6dc9e5ab
+    rev: 1.6.2
     hooks:
       - id: bandit
         args:
@@ -59,13 +59,13 @@ repos:
           - bandit.yml
         exclude: ^.*(tests)/.*\.py$
   - repo: https://github.com/PyCQA/pydocstyle
-    rev: 2549847f9efad225789f931e83dfe782418ca13e
+    rev: 4.0.0
     hooks:
       - id: pydocstyle
         verbose: true
         args:
           - --convention=numpy
-          - --add-ignore=D100,D104,D105
+          - --add-ignore=D100,D104,D105,D202
           - -e
         exclude: >
           (?x)^(
