@@ -7,7 +7,7 @@ from oauth2client.client import OAuth2Credentials
 from .configure import RequiredEnvironmentError
 
 app = Flask(__name__)
-app.config["OIDC_CLIENT_SECRETS"] = "client-secrets.json"
+app.config["OIDC_CLIENT_SECRETS"] = os.getenv("BARRIER_CLIENT_SECRETS", "client-secrets.json")
 app.config["OIDC_COOKIE_SECURE"] = False
 app.config["OIDC_CALLBACK_ROUTE"] = "/oidc/callback"
 app.config["OIDC_SCOPES"] = ["openid", "email", "profile"]
