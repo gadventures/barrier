@@ -13,22 +13,27 @@ class BarrierApplication(BaseApplication):
 
     Parameters
     ----------
-    application
-        Call
+    application : Flask
+        Barrier app
+    settings : Mapping[str, Union[str, int]]
+        WSGI Server Options:
+        -  bind: [str "HOST:PORT"]
+        -  workers: [int NUMBER OF WORKERS]
+
     """
 
-    def __init__(self, application: Flask, options: Mapping[str, Union[str, int]] = None):
+    def __init__(self, application: Flask, settings: Mapping[str, Union[str, int]] = None):
         self.application = application
-        self.options = options
+        self.settings = settings
         super().__init__()
 
     def __is_valid_setting(self, key: str, value: Union[str, int]) -> bool:
-        """Validate that key is a canonical setting that value exists."""
+        """Validate that key is a canonical setting and value is non-null."""
         return key in self.cfg.settings and value is not None
 
     def load_config(self):
         """Load and validate configuration."""
-        validated_options = {key: value for key, value in self.options.items() if self.__is_valid_setting(key, value)}
+        validated_options = {key: value for key, value in self.settings.items() if self.__is_valid_setting(key, value)}
         for key, value in validated_options.items():
             self.cfg.set(key.lower(), value)
 

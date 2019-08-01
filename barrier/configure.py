@@ -35,7 +35,7 @@ def convert_option_name_to_environment_variable_name(option_name: str) -> str:
     return f"BARRIER_{option_name.upper().replace('-', '_')}"
 
 
-def required_option(option_name: str) -> click.option:
+def required_option_or_envvar(option_name: str) -> click.option:
     """Generate a required Click option with envvar support and help message."""
 
     def is_null(environment_variable_name):
@@ -50,18 +50,22 @@ def required_option(option_name: str) -> click.option:
     )
 
 
-@required_option("client-id")
-@required_option("client-secret")
-@required_option("auth-uri")
-@required_option("token-uri")
-@required_option("issuer")
-@required_option("userinfo-uri")
-@required_option("redirect-uri")
+@required_option_or_envvar("client-id")
+@required_option_or_envvar("client-secret")
+@required_option_or_envvar("auth-uri")
+@required_option_or_envvar("token-uri")
+@required_option_or_envvar("issuer")
+@required_option_or_envvar("userinfo-uri")
+@required_option_or_envvar("redirect-uri")
 @click.command()
 def main(
     client_id: str, client_secret: str, auth_uri: str, token_uri: str, issuer: str, userinfo_uri: str, redirect_uri: str
 ):
-    """Generate client secrets file."""
+    """Generate client-secrets.json in current working directory for use with Barrier service.
+
+    You can pass the values as either CLI options and environment variables or a combination of the two. CLI options
+    take precedence over environment variables when both are present.
+    """
     client_secrets_json = CLIENT_SECRETS_TEMPLATE.format(**locals())
     pathlib.Path("client-secrets.json").write_text(client_secrets_json, encoding="utf-8")
 
