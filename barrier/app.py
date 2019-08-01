@@ -4,15 +4,32 @@ from flask import Flask, redirect, send_from_directory
 from flask_oidc import OpenIDConnect
 from oauth2client.client import OAuth2Credentials
 
+from .configure import RequiredEnvironmentError
+
 app = Flask(__name__)
-app.config["OIDC_CLIENT_SECRETS"] = "./client-secrets.json"
+app.config["OIDC_CLIENT_SECRETS"] = "client-secrets.json"
 app.config["OIDC_COOKIE_SECURE"] = False
 app.config["OIDC_CALLBACK_ROUTE"] = "/oidc/callback"
 app.config["OIDC_SCOPES"] = ["openid", "email", "profile"]
 app.config["SECRET_KEY"] = os.getenv("BARRIER_SECRET_KEY")
 app.config["DEFAULT_RESOURCE"] = os.getenv("BARRIER_DEFAULT_RESOURCE", "index.html")
 app.config["RESOURCE_PATH"] = os.getenv("BARRIER_RESOURCE_PATH", "build/html")
-oidc = OpenIDConnect(app)
+
+
+# Pre-conditions
+# --------------
+
+try:
+    oidc = OpenIDConnect(app)
+except FileNotFoundError:
+    raise RequiredEnvironmentError("'client-secrets.json' not found. Run 'barrier-config' to create it.")
+else:
+    if not app.config["SECRET_KEY"]:
+        raise RequiredEnvironmentError("BARRIER_SECRET_KEY not found in environment variables.")
+
+
+# Routes
+# ------
 
 
 @app.route("/")
@@ -37,16 +54,27 @@ def login():
 def logout():
     """End the request user's OpenIDConnect-authenticated session."""
     try:
+        # Get ID for request user (i.e. the 'Subject' of the credentials)
         subject_identifier = oidc.user_getfield("sub")
+
+        # Retrieve OIDC authentication details from in-memory credentials store
         json_oidc_credentials = oidc.credentials_store[subject_identifier]
         oauth2_credentials = OAuth2Credentials.from_json(json_oidc_credentials)
+
+        # Select the JSON Web Token (JWT) to expire with the issuer.
         id_token_jwt = oauth2_credentials.token_response["id_token"]
+
+        # Find the base URL for the credentials issuer
         oidc_credentials_issuer_uri = oauth2_credentials.id_token["iss"]
+
+        # Build OIDC-spec Logout URL which explicitly declares the token to expire
         logout_url = f"{oidc_credentials_issuer_uri}/v1/logout?id_token_hint={id_token_jwt}"
+
         return redirect(logout_url)
     except KeyError:
         pass
     finally:
+        # Expire local session
         oidc.logout()
 
 
