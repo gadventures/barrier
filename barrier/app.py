@@ -33,6 +33,7 @@ else:
 
 
 @app.route("/")
+@oidc.require_login
 def root():
     """Redirect to index.html."""
     return redirect(app.config["DEFAULT_RESOURCE"])

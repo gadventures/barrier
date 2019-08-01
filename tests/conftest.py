@@ -1,6 +1,8 @@
 import os
+from functools import wraps
 from unittest import mock
 
+import flask_oidc
 import pytest
 from flask.testing import FlaskClient
 
@@ -32,7 +34,28 @@ def inject_client_secrets(tmp_path):
 
 
 @pytest.fixture
-def client(inject_secret_key, inject_client_secrets) -> FlaskClient:
+def enable_login_override():
+    """Patch the OpenIDConnect client to toggle session state explicitly."""
+
+    def mock_require_login(self, f):
+        settings = {"allow_all_traffic": False}
+
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if settings["allow_all_traffic"]:
+                return f(*args, **kwargs)
+            else:
+                return self.redirect_to_auth_server()
+
+        wrapped.settings = settings
+        return wrapped
+
+    with mock.patch.object(flask_oidc.OpenIDConnect, "require_login", mock_require_login):
+        yield
+
+
+@pytest.fixture
+def client(inject_secret_key, inject_client_secrets, enable_login_override) -> FlaskClient:
     """Produce a test client for barrier app."""
     from barrier.app import app
 
