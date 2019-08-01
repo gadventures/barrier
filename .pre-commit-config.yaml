@@ -67,9 +67,3 @@ repos:
           - --convention=numpy
           - --add-ignore=D100,D104,D105,D202
           - -e
-        exclude: >
-          (?x)^(
-              .*/migrations/.*\.py$|
-              .*/admin.*\.py$|
-              mig3/manage\.py$
-          )$
