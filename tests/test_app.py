@@ -52,12 +52,12 @@ def test_resource_proxy_route_without_session(client):
     """Should induce redirect to login page."""
     from barrier.app import oidc
 
-    response = client.get("/some-resource.html")
+    response = client.get("/test-resource.html")
     assert response.location.startswith(oidc.client_secrets["auth_uri"])
 
 
 def test_root_route_with_session(client):
-    """Should induce redirect to index.html."""
+    """Should induce redirect to default resource."""
     from barrier.app import app, root
 
     root.settings["allow_all_traffic"] = True
@@ -68,7 +68,7 @@ def test_root_route_with_session(client):
 
 
 def test_login_route_with_session(client):
-    """Should induce redirect to login page."""
+    """Should induce redirect to default resource."""
     from barrier.app import app, login
 
     login.settings["allow_all_traffic"] = True
@@ -78,7 +78,7 @@ def test_login_route_with_session(client):
 
 
 def test_logout_route_with_session(client):
-    """Should induce redirect to login page."""
+    """Should allow logout."""
     from barrier.app import logout
 
     logout.settings["allow_all_traffic"] = True
@@ -87,11 +87,24 @@ def test_logout_route_with_session(client):
         client.get(url_for(".logout"))
 
 
-def test_resource_proxy_route_with_session(client):
-    """Should induce redirect to login page."""
+def test_resource_proxy_route_with_session_and_no_file(client):
+    """Should fail to find missing file for authenticated user."""
     from barrier.app import resource_proxy
 
     resource_proxy.settings["allow_all_traffic"] = True
 
-    response = client.get("/some-resource.html")
+    response = client.get("/test-resource.html")
     assert response.status_code == 404
+
+
+def test_resource_proxy_route_with_session_and_existing_file(client, tmp_path):
+    """Should proxy resource for authenticated user."""
+    from barrier.app import app, resource_proxy
+
+    resource_name = "test-resource.html"
+    (tmp_path / resource_name).write_text("Test")
+    app.config["RESOURCE_ROOT"] = str(tmp_path)
+    resource_proxy.settings["allow_all_traffic"] = True
+
+    response = client.get(f"/{resource_name}")
+    assert response.status_code == 200, app.config["RESOURCE_ROOT"]

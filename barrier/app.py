@@ -13,7 +13,7 @@ app.config["OIDC_CALLBACK_ROUTE"] = "/oidc/callback"
 app.config["OIDC_SCOPES"] = ["openid", "email", "profile"]
 app.config["SECRET_KEY"] = os.getenv("BARRIER_SECRET_KEY")
 app.config["DEFAULT_RESOURCE"] = os.getenv("BARRIER_DEFAULT_RESOURCE", "index.html")
-app.config["RESOURCE_PATH"] = os.getenv("BARRIER_RESOURCE_PATH", "build/html")
+app.config["RESOURCE_ROOT"] = os.getenv("BARRIER_RESOURCE_ROOT", "build/html")
 
 
 # Pre-conditions
@@ -83,7 +83,7 @@ def logout():
 @oidc.require_login
 def resource_proxy(resource_path: str) -> str:
     """Safely proxy requests to files relative to the resource path."""
-    return send_from_directory(app.config["RESOURCE_PATH"], resource_path.split("?")[0])
+    return send_from_directory(app.config["RESOURCE_ROOT"], resource_path.split("?")[0])
 
 
 if __name__ == "__main__":
