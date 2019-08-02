@@ -87,6 +87,43 @@ def test_logout_route_with_session(client):
         client.get(url_for(".logout"))
 
 
+@mock.patch("barrier.app.oidc", mock.MagicMock())
+@mock.patch("barrier.app.OAuth2Credentials.from_json")
+def test_logout_redirect(patched_oauth2_credentials, client):
+    """Should redirect user to OpenIDConnect logout endpoint with session id hint as a query parameter."""
+    from barrier.app import logout
+
+    # Bypass login check
+    logout.settings["allow_all_traffic"] = True
+
+    # Mock the credentials issuer to be expected as the domain to be redirected to
+    ISSUER_URI = "https://issuer-uri"
+    patched_oauth2_credentials().id_token = {"iss": ISSUER_URI}
+
+    # Mock JSON Web Token ID to be expected in redirect URI's query parameter
+    ID_TOKEN = "0123456789"
+    patched_oauth2_credentials().token_response = {"id_token": ID_TOKEN}
+
+    response = client.get(url_for(".logout"))
+    assert response.status_code == 302
+    assert response.location.startswith(ISSUER_URI)
+    assert response.location.endswith(ID_TOKEN)
+
+
+@mock.patch("barrier.app.oidc")
+@mock.patch("barrier.app.OAuth2Credentials.from_json", mock.MagicMock())
+def test_logout_with_bad_state(patched_open_id_connect, client):
+    """Should destroy local session if upstream OIDC session cannot be confirmed."""
+    from barrier.app import logout
+
+    # Bypass login check
+    logout.settings["allow_all_traffic"] = True
+    patched_open_id_connect.user_getfield.side_effect = [KeyError]
+
+    response = client.get(url_for(".logout"))
+    assert response.status_code == 302
+
+
 def test_resource_proxy_route_with_session_and_no_file(client):
     """Should fail to find missing file for authenticated user."""
     from barrier.app import resource_proxy

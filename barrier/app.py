@@ -73,7 +73,7 @@ def logout():
 
         return redirect(logout_url)
     except KeyError:
-        pass
+        return redirect(app.config["DEFAULT_RESOURCE"])
     finally:
         # Expire local session
         oidc.logout()
