@@ -1,3 +1,9 @@
+"""Barrier Application.
+
+This script will serve serve HTTP requests and accepts any command line arguments and options that Flask applications
+will accept.
+
+"""
 import os
 
 from flask import Flask, redirect, send_from_directory

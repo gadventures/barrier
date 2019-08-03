@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Configure Client Secrets for Barrier Service.
+"""Client Secrets for Barrier Service.
 
 This script will generate ``client-secrets.json``, which will provide the credentials necessary for ``app.py` to
 integrate with the OpenIDConnect service (i.e. Okta).

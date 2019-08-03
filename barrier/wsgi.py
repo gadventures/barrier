@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+"""Barrier WSGI Service.
+
+This script will serve WSGI requests at the bound address and port using the given number of workers.
+
+"""
 from typing import Mapping, Union
 
 import click
