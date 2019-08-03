@@ -19,19 +19,35 @@ commands:
           name: Run repository pre-commit hooks
           command: pre-commit run --all-files
   install-python-dependencies:
+    parameters:
+      no-dev:
+        default: false
+        type: boolean
     steps:
       - run:
           name: Install Python Dependencies
-          command: poetry install
+          command: poetry install <<# parameters.no-dev >>--no-dev<</ parameters.no-dev >>
   run-tests:
     steps:
       - run:
           name: Run py.test
           command: poetry run py.test
+  build-wheel:
+    steps:
+      - run:
+          name: Build wheel
+          command: poetry build
 
 
 jobs:
-  build-and-test:
+  build-wheel:
+    executor: python
+    steps:
+      - checkout
+      - install-python-dependencies:
+          no-dev: true
+      - build-wheel
+  run-tests:
     executor: python
     steps:
       - checkout
@@ -48,5 +64,6 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - build-and-test
+      - build-wheel
+      - run-tests
       - check-code-quality
