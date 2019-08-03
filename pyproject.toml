@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "barrier"
-version = "0.1.0"
+version = "0.1.1"
 description = "Serve static files safely behind OpenIDConnect-compatible authentication (i.e. Okta)"
 authors = ["Matthew de Verteuil <mdeverteuil@gadventures.com>"]
 license = "MIT"
@@ -10,6 +10,7 @@ python = "^3.7"
 Flask = "^1.1"
 flask-oidc = "^1.4"
 gunicorn = "^19.9"
+poetry-version = "^0.1.3"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^1.17"
