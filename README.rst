@@ -3,6 +3,18 @@ Barrier
 
 Serve static files safely behind OpenIDConnect-compatible authentication (i.e. Okta)
 
+Commands
+--------
+
+The following is a brief overview, but you can call any of these commands with ``--help`` for more information.
+
+``barrier-config``
+    Generate "client-secrets.json", required for running the other commands. See the help text for required options. Options passed on the command line will override any values set in the environment.
+``barrier-dev``
+    Flask development server. Useful if extending this project to add more features.
+``barrier-wsgi``
+    Gunicorn WSGI wrapper. Can be placed behind nginx, Apache, or whatever you like.
+
 Environment
 -----------
 
