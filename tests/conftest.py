@@ -4,7 +4,16 @@ from unittest import mock
 
 import flask_oidc
 import pytest
+from click.testing import CliRunner
 from flask.testing import FlaskClient
+
+
+@pytest.fixture
+def cli_runner():
+    """Generate a Click CLI Driver."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        yield runner
 
 
 @pytest.fixture
