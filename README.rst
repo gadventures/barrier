@@ -3,6 +3,13 @@ Barrier
 
 Serve static files safely behind OpenIDConnect-compatible authentication (i.e. Okta)
 
+Installation
+------------
+
+.. code::
+
+    $ pip install (--user) https://github.com/gadventures/barrier
+
 Commands
 --------
 
