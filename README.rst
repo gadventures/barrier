@@ -17,11 +17,15 @@ The following steps will get you the values necessary to integrate Okta with you
 #.  You will need to enter some details about the application:
 
     *  Name: ``<your barrier-protected site name>``
+
     *  Base URIs: ``https://<your barrier-protected domain>/``
-       *  or ``http://localhost:8000`` during development)
+        *  or ``http://localhost:8000`` during development)
+
     *  Login redirect URIs: ``https://<your barrier-protected domain>/oidc/callback``
-       *  or ``http://localhost:8000/oidc/callback``, & ``http://localhost:5000/oidc/callback`` during development
-    *  Group Assigments: **Everyone** is fine, unless you have different specific requirements.
+        *  or ``http://localhost:8000/oidc/callback``, & ``http://localhost:5000/oidc/callback`` during development
+
+    *  Group Assigments: **Everyone** is fine, unless you have specific requirements.
+
     *  Grant Type Allowed:
         *  Client acting on behalf of itself
             *  ``[ ]`` Client Credentials
