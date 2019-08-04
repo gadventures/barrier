@@ -3,6 +3,47 @@ Barrier
 
 Serve static files safely behind OpenIDConnect-compatible authentication (i.e. Okta)
 
+OpenID Connect Provider Set-up
+------------------------------
+
+Okta
+~~~~
+
+The following steps will get you the values necessary to integrate Okta with your Barrier-protected content.
+
+#.  Go to the **Applications** section of your Okta admin app. (hint: the url of the admin app is ``https://<your organization>>-admin.okta.com/dev/console``)
+#.  Click **Add Application**
+#.  On the **Create New Application** page, choose **Web** and click **Next**
+#.  You will need to enter some details about the application:
+
+    *  Name: ``<your barrier-protected site name>``
+    *  Base URIs: ``https://<your barrier-protected domain>/``
+       *  or ``http://localhost:8000`` during development)
+    *  Login redirect URIs: ``https://<your barrier-protected domain>/oidc/callback``
+       *  or ``http://localhost:8000/oidc/callback``, & ``http://localhost:5000/oidc/callback`` during development
+    *  Group Assigments: **Everyone** is fine, unless you have different specific requirements.
+    *  Grant Type Allowed:
+        *  Client acting on behalf of itself
+            *  ``[ ]`` Client Credentials
+        *  Client acting on behalf of a user
+            *  ``[x]`` Authorization Code
+            *  ``[ ]`` Refresh Token
+            *  ``[ ]`` Implicit (Hybrid)
+
+#.  Click **Next** again
+#.  You're now at the General Settings for your new Okta integration, scroll to the bottom and copy the **Client ID** and **Client secret** values.
+#.  Visit the **Dashboard** page and copy the **Org URL**.
+#.  Use the following guide to set your environment variables [1]_ :
+
+    *  ``BARRIER_CLIENT_ID`` = **Client ID**
+    *  ``BARRIER_CLIENT_SECRET`` = **Client secret**
+    *  ``BARRIER_AUTH_URI`` = ``<Org URL>/oauth2/default/v1/authorize``
+    *  ``BARRIER_TOKEN_URI`` = ``<Org URL>/oauth2/default/v1/token``
+    *  ``BARRIER_ISSUER`` = ``<Org URL>/oauth2/default``
+    *  ``BARRIER_USERINFO_URI`` = ``<Org URL>/oauth2/default/userinfo``
+
+#. Congratulations! You're ready to install or deploy!
+
 Installation
 ------------
 
@@ -60,3 +101,6 @@ Optional
 +--------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
 | ``BARRIER_CLIENT_SECRETS``     | OpenIDConnect secrets configuration file location. If your provider allows automatic configuration download and has a different filename, override with that filename here. (Default: ``client-secrets.json``) | OpenID Connect Provider                                                                                      |
 +--------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------+
+
+
+.. [1] https://developer.okta.com/blog/2018/07/12/flask-tutorial-simple-user-registration-and-login#step-1-create-an-openid-connect-config-file
