@@ -1,9 +1,8 @@
 FROM python:3.7 AS DIST
 WORKDIR /opt/barrier
 
-COPY pyproject.toml pyproject.toml
+COPY pyproject.toml README.rst ./
 COPY barrier barrier
-
 RUN pip install poetry
 
 RUN poetry build
