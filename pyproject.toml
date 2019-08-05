@@ -1,9 +1,11 @@
 [tool.poetry]
 name = "barrier"
-version = "0.1.1"
+version = "0.1.2"
 description = "Serve static files safely behind OpenIDConnect-compatible authentication (i.e. Okta)"
 authors = ["Matthew de Verteuil <mdeverteuil@gadventures.com>"]
 license = "MIT"
+readme = "README.rst"
+repository = "https://github.com/gadventures/barrier"
 
 [tool.poetry.dependencies]
 python = "^3.7"
