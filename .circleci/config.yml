@@ -34,6 +34,7 @@ commands:
           command: poetry run py.test
   build-docker-container:
     steps:
+      - setup_remote_docker
       - run:
           name: Build Docker Container
           command: docker build .
