@@ -62,9 +62,6 @@ def login():
 def logout():
     """End the request user's OpenIDConnect-authenticated session."""
     try:
-        # Expire local session
-        oidc.logout()
-
         # Get ID for request user (i.e. the 'Subject' of the credentials)
         subject_identifier = oidc.user_getfield("sub")
 
@@ -81,8 +78,14 @@ def logout():
         # Build OIDC-spec Logout URL which explicitly declares the token to expire
         logout_url = f"{oidc_credentials_issuer_uri}/v1/logout?id_token_hint={id_token_jwt}"
 
+        # Expire local session
+        oidc.logout()
+        # Expire upstream session
         return redirect(logout_url)
     except KeyError:
+        # Expire local session
+        oidc.logout()
+        # Redirect to default for login
         return redirect(app.config["DEFAULT_RESOURCE"])
 
 
