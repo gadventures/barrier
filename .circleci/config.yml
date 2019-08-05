@@ -14,7 +14,7 @@ commands:
     steps:
       - run:
           name: Install pre-commit
-          command: pip install --user pre-commit==1.17.0
+          command: pip install --user pre-commit==1.18.0
       - run:
           name: Run repository pre-commit hooks
           command: pre-commit run --all-files
