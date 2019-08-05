@@ -32,6 +32,11 @@ commands:
       - run:
           name: Run py.test
           command: poetry run py.test
+  build-docker-container:
+    steps:
+      - run:
+          name: Build Docker Container
+          command: docker build .
   build-wheel:
     steps:
       - run:
@@ -40,13 +45,14 @@ commands:
 
 
 jobs:
-  build-wheel:
+  build-dist:
     executor: python
     steps:
       - checkout
       - install-python-dependencies:
           no-dev: true
       - build-wheel
+      - build-docker-container
   run-tests:
     executor: python
     steps:
@@ -64,6 +70,6 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - build-wheel
+      - build-dist
       - run-tests
       - check-code-quality
