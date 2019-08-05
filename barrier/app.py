@@ -5,6 +5,7 @@ will accept.
 
 """
 import os
+import pathlib
 
 from flask import Flask, redirect, send_from_directory
 from flask_oidc import OpenIDConnect
@@ -19,7 +20,7 @@ app.config["OIDC_CALLBACK_ROUTE"] = "/oidc/callback"
 app.config["OIDC_SCOPES"] = ["openid", "email", "profile"]
 app.config["SECRET_KEY"] = os.getenv("BARRIER_SECRET_KEY")
 app.config["DEFAULT_RESOURCE"] = os.getenv("BARRIER_DEFAULT_RESOURCE", "index.html")
-app.config["RESOURCE_ROOT"] = os.getenv("BARRIER_RESOURCE_ROOT", "build/html")
+app.config["RESOURCE_ROOT"] = os.getenv("BARRIER_RESOURCE_ROOT", pathlib.Path(os.getcwd()) / "build/html")
 
 
 # Pre-conditions
@@ -61,6 +62,9 @@ def login():
 def logout():
     """End the request user's OpenIDConnect-authenticated session."""
     try:
+        # Expire local session
+        oidc.logout()
+
         # Get ID for request user (i.e. the 'Subject' of the credentials)
         subject_identifier = oidc.user_getfield("sub")
 
@@ -80,9 +84,6 @@ def logout():
         return redirect(logout_url)
     except KeyError:
         return redirect(app.config["DEFAULT_RESOURCE"])
-    finally:
-        # Expire local session
-        oidc.logout()
 
 
 @app.route("/<path:resource_path>")
