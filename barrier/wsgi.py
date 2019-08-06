@@ -30,6 +30,7 @@ class BarrierApplication(BaseApplication):
     def __init__(self, application: Flask, settings: Mapping[str, Union[str, int]] = None):
         self.application = application
         self.settings = settings
+        self.settings.update({"access-logfile": "-", "access-log-format": "%s"})
         super().__init__()
 
     def __is_valid_setting(self, key: str, value: Union[str, int]) -> bool:
@@ -56,4 +57,5 @@ def main(bind, workers):
 
 
 if __name__ == "__main__":
+    print("Hi")
     main()

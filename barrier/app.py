@@ -4,14 +4,17 @@ This script will serve serve HTTP requests and accepts any command line argument
 will accept.
 
 """
+import logging
 import os
 import pathlib
 
-from flask import Flask, redirect, send_from_directory
+from flask import Flask, redirect, send_from_directory, url_for
 from flask_oidc import OpenIDConnect
 from oauth2client.client import OAuth2Credentials
 
 from .configure import RequiredEnvironmentError
+
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config["OIDC_CLIENT_SECRETS"] = os.getenv("BARRIER_CLIENT_SECRETS", "client-secrets.json")
@@ -82,11 +85,12 @@ def logout():
         oidc.logout()
         # Expire upstream session
         return redirect(logout_url)
-    except KeyError:
-        # Expire local session
-        oidc.logout()
-        # Redirect to default for login
-        return redirect(app.config["DEFAULT_RESOURCE"])
+    except KeyError:  # Session details not available in local cache
+        # Request user will be redirected through the auth server, back to the logout endpoint in a hairpin maneuver.
+        # The purpose of this is to trigger the callback from the auth server to the OIDC endpoint out-of-band, with the
+        # session details for the request user so that the local cache will have enough information to fully terminate
+        # the upstream session.
+        return oidc.redirect_to_auth_server(url_for(".logout"))
 
 
 @app.route("/<path:resource_path>")
@@ -97,4 +101,4 @@ def resource_proxy(resource_path: str) -> str:
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=8000)

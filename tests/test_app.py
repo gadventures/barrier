@@ -77,19 +77,9 @@ def test_login_route_with_session(client):
     assert response.location.endswith(app.config["DEFAULT_RESOURCE"]), response.location
 
 
-def test_logout_route_with_session(client):
-    """Should allow logout."""
-    from barrier.app import logout
-
-    logout.settings["allow_all_traffic"] = True
-
-    with pytest.raises(Exception, match="User was not authenticated"):
-        client.get(url_for(".logout"))
-
-
 @mock.patch("barrier.app.oidc", mock.MagicMock())
 @mock.patch("barrier.app.OAuth2Credentials.from_json")
-def test_logout_redirect(patched_oauth2_credentials, client):
+def test_logout_route_with_session(patched_oauth2_credentials, client):
     """Should redirect user to OpenIDConnect logout endpoint with session id hint as a query parameter."""
     from barrier.app import logout
 
@@ -113,15 +103,21 @@ def test_logout_redirect(patched_oauth2_credentials, client):
 @mock.patch("barrier.app.oidc")
 @mock.patch("barrier.app.OAuth2Credentials.from_json", mock.MagicMock())
 def test_logout_with_bad_state(patched_open_id_connect, client):
-    """Should destroy local session if upstream OIDC session cannot be confirmed."""
+    """Should redirect in hairpin maneuver to obtain session information through auth service callback."""
     from barrier.app import logout
 
     # Bypass login check
     logout.settings["allow_all_traffic"] = True
-    patched_open_id_connect.user_getfield.side_effect = [KeyError]
 
-    response = client.get(url_for(".logout"))
-    assert response.status_code == 302
+    # Mock missing user details in local cache
+    patched_open_id_connect.user_getfield.side_effect = [KeyError]
+    # Fake a 200 OK for simplicity
+    patched_open_id_connect.redirect_to_auth_server.return_value = "Mock OK"
+
+    client.get(url_for(".logout"))
+
+    # Make sure we will be redirected in hairpin maneuver back to logout from the auth service.
+    patched_open_id_connect.redirect_to_auth_server.assert_called_once_with(url_for(".logout"))
 
 
 def test_resource_proxy_route_with_session_and_no_file(client):
