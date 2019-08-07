@@ -1,6 +1,8 @@
 Barrier
 =======
 
+|build-status|
+
 Serve static files safely behind OpenIDConnect-compatible authentication (i.e. Okta)
 
 OpenID Connect Provider Set-up
@@ -108,3 +110,5 @@ Optional
 
 
 .. [1] https://developer.okta.com/blog/2018/07/12/flask-tutorial-simple-user-registration-and-login#step-1-create-an-openid-connect-config-file
+.. |build-status| image:: https://circleci.com/gh/gadventures/barrier.svg?style=svg&circle-token=eff5518a5d91852a77b467a780b8944cc14ded4a
+    :target: https://circleci.com/gh/gadventures/barrier
